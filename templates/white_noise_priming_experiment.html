@@ -1,0 +1,198 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<!-- 1) Import jQuery from Google CDN -->
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+<!-- 2) Import HeadphoneCheck.js (minified) from McDermott S3 server -->
+	<script type="text/javascript" src="https://s3.amazonaws.com/mcd-headphone-check/v1.0/src/HeadphoneCheck.min.js"></script>
+<!-- 2) Import HeadphoneCheck.css from McDermott S3 server -->
+	<link rel="stylesheet" type="text/css" href="https://s3.amazonaws.com/mcd-headphone-check/v1.0/src/HeadphoneCheckStyle.css">
+
+	<script src="{{ url_for('mp.static', filename='white_noise_priming_experiment.js') }}"></script>
+<div hidden>
+</div>
+
+<div id="general" class="mx-auto mt-5" style="width: 50%;">
+<div id="hc-container"></div>
+
+<div id="loading">
+	Loading
+</div>
+<div id="prolific_id_div" hidden>
+	Please provide your Prolific ID below. Note that if you don't provide your Prolific ID you will not be compensated for this task.
+	<input type="text" id="prolific_id" name="prolific_id" class="form-control" placeholder="Prolific ID" required></input>
+
+	<button onclick="begin_calibration()" class="mt-5 btn btn-secondary">next</button>
+</div>
+<div id="calibration_task" hidden>
+	<h5>Volume Calibration</h5>
+	This experiment will require you to listen to audio files. Please make sure that you are wearing headphones and that you are in a quiet space.
+	<br>
+	Lower the volume on your device and play the audio excerpt below (the audio excerpt is simply noise). Then increase your volume until the sound is loud but comfortable. You may play the excerpt several times until you are satisfied with the volume level. Once you are done, click the "next" button.
+	<br><br>
+	<audio id="calibration_noise_audio" controls>
+		<source src="https://github.com/mpoliak/noise_priming/blob/main/calibration_noise.mp3?raw=true" type="audio/mpeg">
+	</audio>
+	<br>
+	<button onclick="calibration_completed()" class="mt-5 btn btn-secondary">next</button>
+</div>
+<div id="entire_study" hidden>
+	<div id="instructions" class="mt-5">
+		<br><br>
+		Instructions: 
+		<br>
+		In the following study, you will listen to two recordings in a row. The second recording will contain white noise, and that noise can range from quiet to loud, depending on the recording. 
+		<br>
+		Your task is to listen to both recordings, and then rate from 1 to 10 how loud the noise is (1 being quietest and 7 being loudest).
+		<br>
+		Before starting the task, please listen to the following three audio samples to familiarize yourself how loud levels 1, 5, and 10 are.
+	<br>
+	<p>
+	1 - very quiet
+	<br>
+	<audio controls>
+		<source src="https://github.com/mpoliak/noise_priming/blob/main/noise_quietest.mp3?raw=true" type="audio/mpeg">
+	</audio>	
+	</p>
+	<p>
+	5
+	<br>
+	<audio controls>
+		<source src="https://github.com/mpoliak/noise_priming/blob/main/noise_medium.mp3?raw=true" type="audio/mpeg">
+	</audio>
+	</p>
+	<p>
+	10 - very loud
+	<br>
+	<audio controls>
+		<source src="https://github.com/mpoliak/noise_priming/blob/main/noise_loudest.mp3?raw=true" type="audio/mpeg">
+	</audio>
+	</p>
+	</div>
+	<div id="listen1" class="text-center" style="margin-top: 30%;" hidden>Listen to the first recording.</div>
+	<div id="listen2" class="text-center" style="margin-top: 30%;" hidden>Listen to the second recording.</div>
+	<form>
+	<div id = "experimental_audio">
+	{% for item in items %}
+	<div id="part_{{item.presentation_order}}" style="margin-top: 30%;" class="text-center" hidden>
+		Trial: {{item.presentation_order}} / {{items|length}}
+		<br><br>
+		Rate the loudness of the background noise.
+		<br><br><br>
+	<div class="form-check form-check-inline">
+		<input class="form-check-input" type="radio" name="q{{item.presentation_order}}" value=1 id="q{{item.presentation_order}}_1"
+			 data-item="{{item.item}}"
+			 data-language="{{item.language}}"
+			 data-prime="{{item.prime}}"
+			 data-prime_id="{{item.prime_id}}"
+			 data-noise_level="{{item.noise_level}}"
+			 data-presentation_order="{{item.presentation_order}}">
+		<label class="form-check-label" for="q{{item.presentation_order}}_1">1 - Very Quiet</label>
+	</div>
+	<div class="form-check form-check-inline">
+		<input class="form-check-input" type="radio" name="q{{item.presentation_order}}" value=2 id="q{{item.presentation_order}}_2"
+			 data-item="{{item.item}}"
+			 data-language="{{item.language}}"
+			 data-prime="{{item.prime}}"
+			 data-prime_id="{{item.prime_id}}"
+			 data-noise_level="{{item.noise_level}}"
+			 data-presentation_order="{{item.presentation_order}}">
+		<label class="form-check-label" for="q{{item.presentation_order}}_2">2</label>
+	</div>
+	<div class="form-check form-check-inline">
+		<input class="form-check-input" type="radio" name="q{{item.presentation_order}}" value=3 id="q{{item.presentation_order}}_3"
+			 data-item="{{item.item}}"
+			 data-language="{{item.language}}"
+			 data-prime="{{item.prime}}"
+			 data-prime_id="{{item.prime_id}}"
+			 data-noise_level="{{item.noise_level}}"
+			 data-presentation_order="{{item.presentation_order}}">
+		<label class="form-check-label" for="q{{item.presentation_order}}_3">3</label>
+	</div>
+	<div class="form-check form-check-inline">
+		<input class="form-check-input" type="radio" name="q{{item.presentation_order}}" value=4 id="q{{item.presentation_order}}_4"
+			 data-item="{{item.item}}"
+			 data-language="{{item.language}}"
+			 data-prime="{{item.prime}}"
+			 data-prime_id="{{item.prime_id}}"
+			 data-noise_level="{{item.noise_level}}"
+			 data-presentation_order="{{item.presentation_order}}">
+		<label class="form-check-label" for="q{{item.presentation_order}}_4">4</label>
+	</div>
+	<div class="form-check form-check-inline">
+		<input class="form-check-input" type="radio" name="q{{item.presentation_order}}" value=5 id="q{{item.presentation_order}}_5"
+			 data-item="{{item.item}}"
+			 data-language="{{item.language}}"
+			 data-prime="{{item.prime}}"
+			 data-prime_id="{{item.prime_id}}"
+			 data-noise_level="{{item.noise_level}}"
+			 data-presentation_order="{{item.presentation_order}}">
+		<label class="form-check-label" for="q{{item.presentation_order}}_5">5</label>
+	</div>
+	<div class="form-check form-check-inline">
+		<input class="form-check-input" type="radio" name="q{{item.presentation_order}}" value=6 id="q{{item.presentation_order}}_6"
+			 data-item="{{item.item}}"
+			 data-language="{{item.language}}"
+			 data-prime="{{item.prime}}"
+			 data-prime_id="{{item.prime_id}}"
+			 data-noise_level="{{item.noise_level}}"
+			 data-presentation_order="{{item.presentation_order}}">
+		<label class="form-check-label" for="q{{item.presentation_order}}_6">6</label>
+	</div>
+	<div class="form-check form-check-inline">
+		<input class="form-check-input" type="radio" name="q{{item.presentation_order}}" value=7 id="q{{item.presentation_order}}_7"
+			 data-item="{{item.item}}"
+			 data-language="{{item.language}}"
+			 data-prime="{{item.prime}}"
+			 data-prime_id="{{item.prime_id}}"
+			 data-noise_level="{{item.noise_level}}"
+			 data-presentation_order="{{item.presentation_order}}">
+		<label class="form-check-label" for="q{{item.presentation_order}}_7">7</label>
+	</div>
+	<div class="form-check form-check-inline">
+		<input class="form-check-input" type="radio" name="q{{item.presentation_order}}" value=8 id="q{{item.presentation_order}}_8"
+			 data-item="{{item.item}}"
+			 data-language="{{item.language}}"
+			 data-prime="{{item.prime}}"
+			 data-prime_id="{{item.prime_id}}"
+			 data-noise_level="{{item.noise_level}}"
+			 data-presentation_order="{{item.presentation_order}}">
+		<label class="form-check-label" for="q{{item.presentation_order}}_8">8</label>
+	</div>
+	<div class="form-check form-check-inline">
+		<input class="form-check-input" type="radio" name="q{{item.presentation_order}}" value=9 id="q{{item.presentation_order}}_9"
+			 data-item="{{item.item}}"
+			 data-language="{{item.language}}"
+			 data-prime="{{item.prime}}"
+			 data-prime_id="{{item.prime_id}}"
+			 data-noise_level="{{item.noise_level}}"
+			 data-presentation_order="{{item.presentation_order}}">
+		<label class="form-check-label" for="q{{item.presentation_order}}_9">9</label>
+	</div>
+	<div class="form-check form-check-inline">
+		<input class="form-check-input" type="radio" name="q{{item.presentation_order}}" value=10 id="q{{item.presentation_order}}_10"
+			 data-item="{{item.item}}"
+			 data-language="{{item.language}}"
+			 data-prime="{{item.prime}}"
+			 data-prime_id="{{item.prime_id}}"
+			 data-noise_level="{{item.noise_level}}"
+			 data-presentation_order="{{item.presentation_order}}">
+		<label class="form-check-label" for="q{{item.presentation_order}}_10">10 - Very Loud</label>
+	</div>
+	</div>
+	<audio id="{{item.presentation_order}}_prime">
+		<source src="{{item.prime_link}}" type="audio/mpeg">
+	</audio>
+	<audio id="{{item.presentation_order}}_critical">
+		<source src="{{item.critical_link}}" type="audio/mpeg">
+	</audio>
+	{% endfor %}
+	</div>
+	</form>
+	<div id="button_div" class="text-center">
+		<button onclick="run_trial()" class="mt-5 btn btn-secondary" id="start_button">start</button>
+	</div>
+</div>
+</div>
+{% endblock %}
